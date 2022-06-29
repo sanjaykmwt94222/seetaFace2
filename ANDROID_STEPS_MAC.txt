@@ -1,0 +1,44 @@
+***********************************************************************
+==================================================================
+New Liveness SDK command for Compiling Models/Dependencies
+==================================================================
+***********************************************************************
+
+NOTE: Required NDK Version to build successfully is 21.4.7075529
+export ANDROID_NDK=/home/android-ndk
+
+METHOD1 :
+
+Standard method, the one given on Seeta Repo.
+cmake .. -DCMAKE_INSTALL_PREFIX=install \
+        -DCMAKE_BUILD_TYPE=MinSizeRel \
+        -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK}/build/cmake/android.toolchain.cmake \
+        -DANDROID_ABI="arm64-v8a" \
+        -DANDROID_PLATFORM=android-21 \
+        -DBUILD_EXAMPLE=OFF
+
+cmake .. -DCMAKE_INSTALL_PREFIX=install \
+        -DCMAKE_BUILD_TYPE=MinSizeRel \
+        -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK}/build/cmake/android.toolchain.cmake \
+        -DANDROID_ABI="armeabi-v7a" \
+        -DANDROID_PLATFORM=android-21 \
+        -DBUILD_EXAMPLE=OFF
+
+cmake --build . --config MinSizeRel
+
+cmake --build . --config MinSizeRel --target install/strip
+
+
+METHOD2 :
+It can reduce the size of .so file by 15 times
+cd SeetaFace
+/Users/vinaymishra/Library/Android/sdk/ndk/21.4.7075529/ndk-build
+
+
+STEPS
+------
+0. All useful directories are - SeetaNet, FaceDetector, FaceLandmarker, FaceRecognizer, FaceTracker and QualityAssessor.
+1. Change project() parameter in CMakeLists.txt file of every directory. This is the name that will be given to each .so file and will be used by others to access them.
+2. Change 'target_link_libraries' field in CMakeLists.txt of every directory (except SeetaNet) and make it equal to the name given to the SeetaNet's CMakeLists.txt project() field. Do not change the target_include_directories field as it takes the code from the original SeetaNet folder.
+3. Change the LOCAL_SRC_FILES field in Android.mk files inside jni folders of every directory. Give path name(libseetanet2.so) of the new .so file of SeetaNet generated.
+4. Give different architecture names in Application.mk file for different .so compiled results.
